@@ -134,8 +134,9 @@ public class Signature {
     public static Signature fromString(String authorization) {
         try {
             authorization = normalize(authorization);
-
-            final String[] split = authorization.split(",");
+            // Need to remove last '"' as it is for the last value and won't be removed by the split.
+            authorization = authorization.substring(0, authorization.lastIndexOf('"'));
+            final String[] split = authorization.split("\",");
 
             final Map<String, String> map = new HashMap<String, String>();
 
@@ -144,7 +145,7 @@ public class Signature {
                 final int i = s.indexOf("=\"");
 
                 final String key = s.substring(0, i).toLowerCase();
-                final String value = s.substring(i + 2, s.length() - 1);
+                final String value = s.substring(i + 2, s.length());
 
                 map.put(key, value);
             }
@@ -175,7 +176,7 @@ public class Signature {
         }
     }
 
-    private static String normalize(String authorization) {
+    public static String normalize(String authorization) {
         final String start = "signature ";
 
         final String prefix = authorization.substring(0, start.length()).toLowerCase();
